@@ -1,0 +1,60 @@
+import torch
+from scipy.spatial import distance
+import numpy as np
+from math import sqrt
+
+
+def evaluate_matches(gt_keypoint_src, gt_keypoint_dst, matches, distance_matching_threshold,distance_list,matching_threshold):
+    nb_false_matching = 0
+    nb_true_matches = 0
+    nb_rejected_matches = 0
+
+    for j in range(0, len(gt_keypoint_src[0])):
+        xp = int(gt_keypoint_dst[0][j][0])
+        yp = int(gt_keypoint_dst[0][j][1])
+        xp2 = int(gt_keypoint_dst[0][matches[j]][0])
+        yp2 = int(gt_keypoint_dst[0][matches[j]][1])
+        dist = sqrt((yp - yp2) ** 2 + (xp - xp2) ** 2)
+
+        if distance_list[j] > matching_threshold:
+            nb_rejected_matches += 1
+        elif dist <= distance_matching_threshold:
+            nb_true_matches += 1
+        else:
+            nb_false_matching += 1
+
+    return nb_false_matching, nb_true_matches, nb_rejected_matches
+
+
+def feature_extraction(patches,keypoint,score, model,image,):
+    list_desc = []
+    model.eval()
+    with torch.no_grad():
+       list_desc=model(patches,keypoint,score,image)
+    desc= list_desc.reshape(list_desc.shape[1], list_desc.shape[2]).transpose(0,1)
+
+    desc= torch.Tensor.cpu(desc).detach().numpy()
+
+    return desc
+
+
+def feature_match(feature_vectors_1, feature_vectors_2, matching_threshold):
+    matched_idx = []
+    distance_list = []
+
+    for i in range(0, len(feature_vectors_1)):
+        distance_sim = []
+        for j in range(0, len(feature_vectors_2)):
+
+            sim = distance.euclidean(feature_vectors_1[i], feature_vectors_2[j])
+            distance_sim.append(sim)
+
+        candidate_index = np.argsort(distance_sim)[:2]
+        distance_list.extend([distance_sim[candidate_index[0]]])
+        '''if distance_sim[candidate_index[0]] > matching_threshold:
+            # set -1 if no match found for the current vector
+            matched_idx.append(-1)
+        else:'''
+        matched_idx.extend([candidate_index[0]])
+
+    return matched_idx, distance_list

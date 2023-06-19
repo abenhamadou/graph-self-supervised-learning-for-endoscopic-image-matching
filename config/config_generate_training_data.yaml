@@ -1,0 +1,14 @@
+paths:
+        raw_data_dirs: ["./data/train_dataset/sequence_1/frames",
+                         "./data/train_dataset/sequence_2/frames"]
+        export_dir: "./data/train_dataset"
+
+params:
+        keypoint_extractor: "SIFT"
+        # distance in pixel
+        keypoint_dist_threshold: 3
+        patch_size: 64
+
+hydra:
+    job:
+        chdir: true

@@ -1,0 +1,12 @@
+paths:
+    log: "runs"
+    validation_data: "./data/test_dataset"
+params:
+        model_name: "Attentional_GNN"
+        #weights_path: "/home/achraf/workspace/crns/gitprojects/graph-self-supervised-learning-for-endoscopic-image-matching/outputs/2023-06-19/10-49-03/Attentinal_GNN.pth"
+        weights_path: "/home/achraf/workspace/crns/gitprojects/Self-Supervised-Endoscopic-Image-Key-Points-Matching/gnn_based/GNN_Model.pth"
+        image_size: 128
+        patch_size: 64
+        matching_threshold: 5
+        distance_matching_threshold: 5
+        batch_size: 1
